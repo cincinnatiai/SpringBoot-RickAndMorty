@@ -1,32 +1,38 @@
 package com.rickmorty.characterapi.controller;
 
-import com.rickmorty.characterapi.dto.RickAndMortyResponse;
-import com.rickmorty.characterapi.mapper.CharacterMapper;
-import com.rickmorty.characterapi.repository.CharacterRepository;
-import com.rickmorty.characterapi.service.CharacterService;
+import com.rickmorty.characterapi.dto.CharacterResponse;
+import com.rickmorty.characterapi.facade.CharacterFacade;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import com.rickmorty.characterapi.model.Character;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/characters")
 public class CharacterController {
 
-    private final CharacterService characterService;
+    private final CharacterFacade facade;
 
-    public CharacterController(CharacterService characterService){
-        this.characterService = characterService;
+    public CharacterController(CharacterFacade facade) {
+        this.facade = facade;
     }
 
     @GetMapping
-    public List<Character> getCharacters(){
-        return characterService.getCharacters();
+    public CharacterResponse getCharacters() {
+        return facade.getCharacters();
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteCharacters(){
+        int deleted = facade.deleteAllCharacters();
+        return ResponseEntity.ok(Map.of(
+                "deletedCount", deleted,
+                "message", "deleted all characters"
+
+        ));
+    }
 }
